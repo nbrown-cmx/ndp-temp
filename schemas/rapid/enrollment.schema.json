@@ -1,0 +1,1185 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$ref": "#/definitions/Bundle",
+    "description": "A container for a collection of resources",
+    "definitions": {
+        "base64Binary": {
+            "type": "string",
+            "description": "A stream of bytes"
+        },
+        "code": {
+            "pattern": "^[^\\s]+( [^\\s]+)*$",
+            "type": "string",
+            "description": "A string which has at least one character and no leading or trailing whitespace and where there is no whitespace other than single spaces in the contents"
+        },
+        "date": {
+            "pattern": "^([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1]))?)?$",
+            "type": "string",
+            "description": "A date or partial date (e.g. just year or year + month). There is no UTC offset. The format is a union of the schema types gYear, gYearMonth and date.  Dates SHALL be valid dates."
+        },
+        "id": {
+            "pattern": "^[A-Za-z0-9\\-\\.]{1,64}$",
+            "type": "string",
+            "description": "Any combination of letters, numerals, \"-\" and \".\", with a length limit of 64 characters.  (This might be an integer, an unprefixed OID, UUID or any other identifier pattern that meets these constraints.)  Ids are case-insensitive."
+        },
+        "instant": {
+            "pattern": "^([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]{1,9})?(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))$",
+            "type": "string",
+            "description": "An instant in time - known at least to the second"
+        },
+        "positiveInt": {
+            "pattern": "^[1-9][0-9]*$",
+            "type": "number",
+            "description": "An integer with a value that is positive (e.g. \u003e0)"
+        },
+        "string": {
+            "pattern": "^^[\\s\\S]+$$",
+            "type": "string",
+            "description": "A sequence of Unicode characters"
+        },
+        "unsignedInt": {
+            "pattern": "^[0]|([1-9][0-9]*)$",
+            "type": "number",
+            "description": "An integer with a value that is not negative (e.g. \u003e\u003d 0)"
+        },
+        "uri": {
+            "pattern": "^\\S*$",
+            "type": "string",
+            "description": "String of characters used to identify a name or a resource"
+        },
+        "Address": {
+            "description": "An address expressed using postal conventions (as opposed to GPS or other location definition formats).  This data type may be used to convey addresses for use in delivering mail as well as for visiting locations which might not be valid for mail delivery.  There are a variety of postal address formats defined around the world.\nThe ISO21090-codedString may be used to provide a coded representation of the contents of strings in an Address.",
+            "properties": {
+                "type": {
+                    "description": "Distinguishes between physical addresses (those you can visit) and mailing addresses (e.g. PO Boxes and care-of addresses). Most addresses are both.",
+                    "enum": [
+                        "postal",
+                        "physical",
+                        "both"
+                    ]
+                },
+                "line": {
+                    "description": "This component contains the house number, apartment number, street name, street direction,  P.O. Box number, delivery hints, and similar address information.",
+                    "items": {
+                        "$ref": "#/definitions/string"
+                    },
+                    "type": "array"
+                },
+                "city": {
+                    "description": "The name of the city, town, suburb, village or other community or delivery center.",
+                    "$ref": "#/definitions/string"
+                },
+                "state": {
+                    "description": "Sub-unit of a country with limited sovereignty in a federally organized country. A code may be used if codes are in common use (e.g. US 2 letter state codes).",
+                    "$ref": "#/definitions/string"
+                },
+                "postalCode": {
+                    "description": "A postal code designating a region defined by the postal service.",
+                    "$ref": "#/definitions/string"
+                },
+                "country": {
+                    "description": "Country - a nation as commonly understood or generally accepted.",
+                    "$ref": "#/definitions/string"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "Binary": {
+            "description": "A resource that represents the data of a single raw artifact as digital content accessible in its native format.  A Binary resource can contain any content, whether text, image, pdf, zip archive, etc.",
+            "properties": {
+                "resourceType": {
+                    "description": "This is a Binary resource",
+                    "const": "Binary"
+                },
+                "id": {
+                    "description": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+                    "$ref": "#/definitions/id"
+                },
+                "contentType": {
+                    "description": "MimeType of the binary content represented as a standard MimeType (BCP 13).",
+                    "$ref": "#/definitions/code"
+                },
+                "data": {
+                    "description": "The actual content, base64 encoded.",
+                    "$ref": "#/definitions/base64Binary"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "resourceType"
+            ]
+        },
+        "Bundle": {
+            "description": "A container for a collection of resources related to enrollment into Phyz",
+            "properties": {
+                "resourceType": {
+                    "description": "This is a Bundle resource",
+                    "const": "Bundle"
+                },
+                "id": {
+                    "description": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+                    "$ref": "#/definitions/id"
+                },
+                "identifier": {
+                    "description": "A persistent identifier for the bundle that won\u0027t change as a bundle is copied from server to server.",
+                    "$ref": "#/definitions/Identifier"
+                },
+                "type": {
+                    "description": "Indicates the purpose of this bundle - how it is intended to be used.",
+                    "$ref": "#/definitions/code"
+                },
+                "timestamp": {
+                    "description": "The date/time that the bundle was assembled - i.e. when the resources were placed in the bundle.",
+                    "$ref": "#/definitions/instant"
+                },
+                "entry": {
+                    "description": "An entry in a bundle resource - will either contain a resource or information about a resource (transactions and history only).",
+                    "items": {
+                        "$ref": "#/definitions/Bundle_Entry"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "resourceType"
+            ]
+        },
+        "Bundle_Entry": {
+            "description": "A container for a collection of resources.",
+            "properties": {
+                "fullUrl": {
+                    "description": "The Absolute URL for the resource. Except for transactions and batches, each entry in a Bundle must have a fullUrl. The fullUrl SHALL NOT disagree with the id in the resource - i.e. if the fullUrl is not a urn:uuid, the URL shall be version-independent URL consistent with the Resource.id. The fullUrl is a version independent reference to the resource. Even when not required, fullUrl MAY be set to a urn:uuid to allow referencing entries in a transaction. The fullUrl can be an arbitrary URI and is not limited to urn:uuid, urn:oid, http, and https. The fullUrl element SHALL have a value except when: \n* invoking a create\n* invoking or responding to an operation where the body is not a single identified resource\n* invoking or returning the results of a search or history operation.",
+                    "$ref": "#/definitions/uri"
+                },
+                "resource": {
+                    "description": "The Resource for the entry. The purpose/meaning of the resource is determined by the Bundle.type. This is allowed to be a Parameters resource if and only if it is referenced by something else within the Bundle that provides context/meaning.",
+                    "$ref": "#/definitions/ResourceList"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "CodeableConcept": {
+            "description": "A concept that may be defined by a formal reference to a terminology or ontology or may be provided by text.",
+            "properties": {
+                "coding": {
+                    "description": "A reference to a code defined by a terminology system.",
+                    "items": {
+                        "$ref": "#/definitions/Coding"
+                    },
+                    "type": "array"
+                },
+                "text": {
+                    "description": "A human language representation of the concept as seen/selected/uttered by the user who entered the data and/or which represents the intended meaning of the user.",
+                    "$ref": "#/definitions/string"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "Coding": {
+            "description": "A reference to a code defined by a terminology system.",
+            "properties": {
+                "system": {
+                    "description": "The identification of the code system that defines the meaning of the symbol in the code.",
+                    "$ref": "#/definitions/uri"
+                },
+                "code": {
+                    "description": "A symbol in syntax defined by the system. The symbol may be a predefined code or an expression in a syntax defined by the coding system (e.g. post-coordination).",
+                    "$ref": "#/definitions/code"
+                },
+                "display": {
+                    "description": "A representation of the meaning of the code in the system, following the rules of the system.",
+                    "$ref": "#/definitions/string"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "Condition": {
+            "description": "A clinical condition, problem, diagnosis, or other event, situation, issue, or clinical concept that has risen to a level of concern.",
+            "properties": {
+                "resourceType": {
+                    "description": "This is a Condition resource",
+                    "const": "Condition"
+                },
+                "id": {
+                    "description": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+                    "$ref": "#/definitions/id"
+                },
+                "clinicalStatus": {
+                    "description": "The clinical status of the condition.",
+                    "$ref": "#/definitions/CodeableConcept"
+                },
+                "code": {
+                    "description": "Identification of the condition, problem or diagnosis.",
+                    "$ref": "#/definitions/CodeableConcept"
+                },
+                "subject": {
+                    "description": "Indicates the patient or group who the condition record is associated with.",
+                    "$ref": "#/definitions/Reference"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "subject",
+                "clinicalStatus",
+                "resourceType"
+            ]
+        },
+        "ContactPoint": {
+            "description": "Details for all kinds of technology mediated contact points for a person or organization, including telephone, email, etc.",
+            "properties": {
+                "system": {
+                    "description": "Telecommunications form for contact point - what communications system is required to make use of the contact.",
+                    "enum": [
+                        "phone",
+                        "fax",
+                        "email",
+                        "pager",
+                        "url",
+                        "sms",
+                        "other"
+                    ]
+                },
+                "value": {
+                    "description": "The actual contact point details, in a form that is meaningful to the designated communication system (i.e. phone number or email address).",
+                    "$ref": "#/definitions/string"
+                },
+                "use": {
+                    "description": "Identifies the purpose for the contact point.",
+                    "enum": [
+                        "home",
+                        "work",
+                        "temp",
+                        "old",
+                        "mobile"
+                    ]
+                },
+                "rank": {
+                    "description": "Specifies a preferred order in which to use a set of contacts. ContactPoints with lower rank values are more preferred than those with higher rank values.",
+                    "$ref": "#/definitions/positiveInt"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "Coverage": {
+            "description": "Financial instrument which may be used to reimburse or pay for health care products and services. Includes both insurance and self-payment.",
+            "properties": {
+                "resourceType": {
+                    "description": "This is a Coverage resource",
+                    "const": "Coverage"
+                },
+                "id": {
+                    "description": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+                    "$ref": "#/definitions/id"
+                },
+                "status": {
+                    "description": "The status of the resource instance.",
+                    "$ref": "#/definitions/code"
+                },
+                "type": {
+                    "description": "The type of coverage: social program, medical plan, accident coverage (workers compensation, auto), group health or payment by an individual or organization.",
+                    "$ref": "#/definitions/CodeableConcept"
+                },
+                "subscriber": {
+                    "description": "The party who has signed-up for or \u0027owns\u0027 the contractual relationship to the policy or to whom the benefit of the policy for services rendered to them or their family is due.",
+                    "$ref": "#/definitions/Reference"
+                },
+                "subscriberId": {
+                    "description": "The insurer assigned ID for the Subscriber.",
+                    "items": {
+                        "$ref": "#/definitions/Identifier"
+                    },
+                    "type": "array"
+                },
+                "beneficiary": {
+                    "description": "The party who benefits from the insurance coverage; the patient when products and/or services are provided.",
+                    "$ref": "#/definitions/Reference"
+                },
+                "insurer": {
+                    "description": "The program or plan underwriter, payor, insurance company.",
+                    "$ref": "#/definitions/Reference"
+                },
+                "class": {
+                    "description": "A suite of underwriter specific classifiers.",
+                    "items": {
+                        "$ref": "#/definitions/Coverage_Class"
+                    },
+                    "type": "array"
+                },
+                "order": {
+                    "description": "The order of applicability of this coverage relative to other coverages which are currently in force. Note, there may be gaps in the numbering and this does not imply primary, secondary etc. as the specific positioning of coverages depends upon the episode of care. For example; a patient might have (0) auto insurance (1) their own health insurance and (2) spouse\u0027s health insurance. When claiming for treatments which were not the result of an auto accident then only coverages (1) and (2) above would be applicatble and would apply in the order specified in parenthesis.",
+                    "$ref": "#/definitions/positiveInt"
+                },
+                "network": {
+                    "description": "The insurer-specific identifier for the insurer-defined network of providers to which the beneficiary may seek treatment which will be covered at the \u0027in-network\u0027 rate, otherwise \u0027out of network\u0027 terms and conditions apply.",
+                    "$ref": "#/definitions/string"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "beneficiary",
+                "resourceType"
+            ]
+        },
+        "Coverage_Class": {
+            "description": "Financial instrument which may be used to reimburse or pay for health care products and services. Includes both insurance and self-payment.",
+            "properties": {
+                "type": {
+                    "description": "The type of classification for which an insurer-specific class label or number and optional name is provided.  For example, type may be used to identify a class of coverage or employer group, policy, or plan.",
+                    "$ref": "#/definitions/CodeableConcept"
+                },
+                "value": {
+                    "description": "The alphanumeric identifier associated with the insurer issued label.",
+                    "$ref": "#/definitions/Identifier"
+                },
+                "name": {
+                    "description": "A short description for the class.",
+                    "$ref": "#/definitions/string"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "type",
+                "value"
+            ]
+        },
+        "Dosage": {
+            "description": "Indicates how the medication is/was taken or should be taken by the patient.",
+            "properties": {
+                "sequence": {
+                    "description": "Indicates the order in which the dosage instructions should be applied or interpreted.",
+                    "$ref": "#/definitions/integer"
+                },
+                "text": {
+                    "description": "Free text dosage instructions e.g. SIG.",
+                    "$ref": "#/definitions/string"
+                },
+                "method": {
+                    "description": "Technique for administering medication.",
+                    "$ref": "#/definitions/CodeableConcept"
+                },
+                "doseAndRate": {
+                    "description": "Depending on the resource,this is the amount of medication administered, to  be administered or typical amount to be administered.",
+                    "items": {
+                        "$ref": "#/definitions/Dosage_DoseAndRate"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "Dosage_DoseAndRate": {
+            "description": "Indicates how the medication is/was taken or should be taken by the patient.",
+            "properties": {
+                "doseQuantity": {
+                    "description": "Amount of medication per dose.",
+                    "$ref": "#/definitions/Quantity"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "ExtendedContactDetail": {
+            "description": "Specifies contact information for a specific purpose over a period of time, might be handled/monitored by a specific named person or organization.",
+            "properties": {
+                "name": {
+                    "description": "The name of an individual to contact, some types of contact detail are usually blank.",
+                    "items": {
+                        "$ref": "#/definitions/HumanName"
+                    },
+                    "type": "array"
+                },
+                "telecom": {
+                    "description": "The contact details application for the purpose defined.",
+                    "items": {
+                        "$ref": "#/definitions/ContactPoint"
+                    },
+                    "type": "array"
+                },
+                "address": {
+                    "description": "Address for the contact.",
+                    "$ref": "#/definitions/Address"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "HumanName": {
+            "description": "A name, normally of a human, that can be used for other living entities (e.g. animals but not organizations) that have been assigned names by a human and may need the use of name parts or the need for usage information.",
+            "properties": {
+                "use": {
+                    "description": "Identifies the purpose for this name.",
+                    "enum": [
+                        "usual",
+                        "official",
+                        "temp",
+                        "nickname",
+                        "anonymous",
+                        "old",
+                        "maiden"
+                    ]
+                },
+                "text": {
+                    "description": "Specifies the entire name as it should be displayed e.g. on an application UI. This may be provided instead of or as well as the specific parts.",
+                    "$ref": "#/definitions/string"
+                },
+                "family": {
+                    "description": "The part of a name that links to the genealogy. In some cultures (e.g. Eritrea) the family name of a son is the first name of his father.",
+                    "$ref": "#/definitions/string"
+                },
+                "given": {
+                    "description": "Given name.",
+                    "items": {
+                        "$ref": "#/definitions/string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "Identifier": {
+            "description": "An identifier - identifies some entity uniquely and unambiguously. Typically this is used for business identifiers.",
+            "properties": {
+                "use": {
+                    "description": "The purpose of this identifier.",
+                    "enum": [
+                        "usual",
+                        "official",
+                        "temp",
+                        "secondary",
+                        "old"
+                    ]
+                },
+                "type": {
+                    "description": "A coded type for the identifier that can be used to determine which identifier to use for a specific purpose.",
+                    "$ref": "#/definitions/CodeableConcept"
+                },
+                "system": {
+                    "description": "Establishes the namespace for the value - that is, an absolute URL that describes a set values that are unique.",
+                    "$ref": "#/definitions/uri"
+                },
+                "value": {
+                    "description": "The portion of the identifier typically relevant to the user and which is unique within the context of the system.",
+                    "$ref": "#/definitions/string"
+                },
+                "assigner": {
+                    "description": "Organization that issued/manages the identifier.",
+                    "$ref": "#/definitions/Reference"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "List": {
+            "description": "A List is a curated collection of resources, for things such as problem lists, allergy lists, facility list, organization list, etc.",
+            "properties": {
+                "resourceType": {
+                    "description": "This is a List resource",
+                    "const": "List"
+                },
+                "id": {
+                    "description": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+                    "$ref": "#/definitions/id"
+                },
+                "status": {
+                    "description": "Indicates the current state of this list.",
+                    "$ref": "#/definitions/code"
+                },
+                "mode": {
+                    "description": "How this list was prepared - whether it is a working list that is suitable for being maintained on an ongoing basis, or if it represents a snapshot of a list of items from another source, or whether it is a prepared list where items may be marked as added, modified or deleted.",
+                    "$ref": "#/definitions/code"
+                },
+                "title": {
+                    "description": "A label for the list assigned by the author.",
+                    "$ref": "#/definitions/string"
+                },
+                "entry": {
+                    "description": "Entries in this list.",
+                    "items": {
+                        "$ref": "#/definitions/List_Entry"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "resourceType"
+            ]
+        },
+        "List_Entry": {
+            "description": "A List is a curated collection of resources, for things such as problem lists, allergy lists, facility list, organization list, etc.",
+            "properties": {
+                "item": {
+                    "description": "A reference to the actual resource from which data was derived.",
+                    "$ref": "#/definitions/Reference"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "item"
+            ]
+        },
+        "MedicationRequest": {
+            "description": "An order or request for both supply of the medication and the instructions for administration of the medication to a patient. The resource is called \"MedicationRequest\" rather than \"MedicationPrescription\" or \"MedicationOrder\" to generalize the use across inpatient and outpatient settings, including care plans, etc., and to harmonize with workflow patterns.",
+            "properties": {
+                "resourceType": {
+                    "description": "This is a MedicationRequest resource",
+                    "const": "MedicationRequest"
+                },
+                "id": {
+                    "description": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+                    "$ref": "#/definitions/id"
+                },
+                "identifier": {
+                    "description": "Identifiers associated with this medication request that are defined by business processes and/or used to refer to it when a direct URL reference to the resource itself is not appropriate. They are business identifiers assigned to this resource by the performer or other systems and remain constant as the resource is updated and propagates from server to server.",
+                    "items": {
+                        "$ref": "#/definitions/Identifier"
+                    },
+                    "type": "array"
+                },
+                "status": {
+                    "description": "A code specifying the current state of the order.  Generally, this will be active or completed state.",
+                    "$ref": "#/definitions/code"
+                },
+                "intent": {
+                    "description": "Whether the request is a proposal, plan, or an original order.",
+                    "$ref": "#/definitions/code"
+                },
+                "medication": {
+                    "description": "Identifies the medication being requested. This is a link to a resource that represents the medication which may be the details of the medication or simply an attribute carrying a code that identifies the medication from a known list of medications.",
+                    "$ref": "#/definitions/CodeableReference"
+                },
+                "subject": {
+                    "description": "The individual or group for whom the medication has been requested.",
+                    "$ref": "#/definitions/Reference"
+                },
+                "supportingInformation": {
+                    "description": "Information to support fulfilling (i.e. dispensing or administering) of the medication, for example, patient height and weight, a MedicationStatement for the patient).",
+                    "items": {
+                        "$ref": "#/definitions/Reference"
+                    },
+                    "type": "array"
+                },
+                "requester": {
+                    "description": "The individual, organization, or device that initiated the request and has responsibility for its activation.",
+                    "$ref": "#/definitions/Reference"
+                },
+                "insurance": {
+                    "description": "Insurance plans, coverage extensions, pre-authorizations and/or pre-determinations that may be required for delivering the requested service.",
+                    "items": {
+                        "$ref": "#/definitions/Reference"
+                    },
+                    "type": "array"
+                },
+                "dosageInstruction": {
+                    "description": "Specific instructions for how the medication is to be used by the patient.",
+                    "items": {
+                        "$ref": "#/definitions/Dosage"
+                    },
+                    "type": "array"
+                },
+                "dispenseRequest": {
+                    "description": "Indicates the specific details for the dispense or medication supply part of a medication request (also known as a Medication Prescription or Medication Order).  Note that this information is not always sent with the order.  There may be in some settings (e.g. hospitals) institutional or system support for completing the dispense details in the pharmacy department.",
+                    "$ref": "#/definitions/MedicationRequest_DispenseRequest"
+                },
+                "substitution": {
+                    "description": "Indicates whether or not substitution can or should be part of the dispense. In some cases, substitution must happen, in other cases substitution must not happen. This block explains the prescriber\u0027s intent. If nothing is specified substitution may be done.",
+                    "$ref": "#/definitions/MedicationRequest_Substitution"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "subject",
+                "medication",
+                "resourceType"
+            ]
+        },
+        "MedicationRequest_DispenseRequest": {
+            "description": "An order or request for both supply of the medication and the instructions for administration of the medication to a patient. The resource is called \"MedicationRequest\" rather than \"MedicationPrescription\" or \"MedicationOrder\" to generalize the use across inpatient and outpatient settings, including care plans, etc., and to harmonize with workflow patterns.",
+            "properties": {
+                "numberOfRepeatsAllowed": {
+                    "description": "An integer indicating the number of times, in addition to the original dispense, (aka refills or repeats) that the patient can receive the prescribed medication. Usage Notes: This integer does not include the original order dispense. This means that if an order indicates dispense 30 tablets plus \"3 repeats\", then the order can be dispensed a total of 4 times and the patient can receive a total of 120 tablets.  A prescriber may explicitly say that zero refills are permitted after the initial dispense.",
+                    "$ref": "#/definitions/unsignedInt"
+                },
+                "quantity": {
+                    "description": "The amount that is to be dispensed for one fill.",
+                    "$ref": "#/definitions/Quantity"
+                },
+                "dispenser": {
+                    "description": "Indicates the intended performing Organization that will dispense the medication as specified by the prescriber.",
+                    "$ref": "#/definitions/Reference"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "MedicationRequest_Substitution": {
+            "description": "An order or request for both supply of the medication and the instructions for administration of the medication to a patient. The resource is called \"MedicationRequest\" rather than \"MedicationPrescription\" or \"MedicationOrder\" to generalize the use across inpatient and outpatient settings, including care plans, etc., and to harmonize with workflow patterns.",
+            "properties": {
+                "allowedBoolean": {
+                    "description": "True if the prescriber allows a different drug to be dispensed from what was prescribed.",
+                    "pattern": "^true|false$",
+                    "type": "boolean"
+                },
+                "reason": {
+                    "description": "Indicates the reason for the substitution, or why substitution must or must not be performed.",
+                    "$ref": "#/definitions/CodeableConcept"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "MessageHeader": {
+            "description": "The header for a message exchange that is either requesting or responding to an action.  The reference(s) that are the subject of the action as well as other information related to the action are typically transmitted in a bundle in which the MessageHeader resource instance is the first resource in the bundle.",
+            "properties": {
+                "resourceType": {
+                    "description": "This is a MessageHeader resource",
+                    "const": "MessageHeader"
+                },
+                "id": {
+                    "description": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+                    "$ref": "#/definitions/id"
+                },
+                "eventCoding": {
+                    "description": "Code that identifies the event this message represents and connects it with its definition. Events defined as part of the FHIR specification are defined by the implementation.  Alternatively a canonical uri to the EventDefinition.",
+                    "$ref": "#/definitions/Coding"
+                },
+                "destination": {
+                    "description": "The destination application which the message is intended for.",
+                    "items": {
+                        "$ref": "#/definitions/MessageHeader_Destination"
+                    },
+                    "type": "array"
+                },
+                "sender": {
+                    "description": "Identifies the sending system to allow the use of a trust relationship.",
+                    "$ref": "#/definitions/Reference"
+                },
+                "source": {
+                    "description": "The source application from which this message originated.",
+                    "$ref": "#/definitions/MessageHeader_Source"
+                },
+                "focus": {
+                    "description": "The actual data of the message - a reference to the root/focus class of the event. This is allowed to be a Parameters resource.",
+                    "items": {
+                        "$ref": "#/definitions/Reference"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "source",
+                "resourceType"
+            ]
+        },
+        "MessageHeader_Destination": {
+            "description": "The header for a message exchange that is either requesting or responding to an action.  The reference(s) that are the subject of the action as well as other information related to the action are typically transmitted in a bundle in which the MessageHeader resource instance is the first resource in the bundle.",
+            "properties": {
+                "endpointUrl": {
+                    "description": "Indicates where the message should be routed.",
+                    "pattern": "^\\S*$",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Human-readable name for the target system.",
+                    "$ref": "#/definitions/string"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "MessageHeader_Source": {
+            "description": "The header for a message exchange that is either requesting or responding to an action.  The reference(s) that are the subject of the action as well as other information related to the action are typically transmitted in a bundle in which the MessageHeader resource instance is the first resource in the bundle.",
+            "properties": {
+                "endpointUrl": {
+                    "description": "Identifies the routing target to send acknowledgements to.",
+                    "pattern": "^\\S*$",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Human-readable name for the source system.",
+                    "$ref": "#/definitions/string"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "Organization": {
+            "description": "A formally or informally recognized grouping of people or organizations formed for the purpose of achieving some form of collective action.  Includes companies, institutions, corporations, departments, community groups, healthcare practice groups, payer/insurer, etc.",
+            "properties": {
+                "resourceType": {
+                    "description": "This is a Organization resource",
+                    "const": "Organization"
+                },
+                "id": {
+                    "description": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+                    "$ref": "#/definitions/id"
+                },
+                "identifier": {
+                    "description": "Identifier for the organization that is used to identify the organization across multiple disparate systems.",
+                    "items": {
+                        "$ref": "#/definitions/Identifier"
+                    },
+                    "type": "array"
+                },
+                "type": {
+                    "description": "The kind(s) of organization that this is.",
+                    "items": {
+                        "$ref": "#/definitions/CodeableConcept"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "description": "A name associated with the organization.",
+                    "$ref": "#/definitions/string"
+                },
+                "alias": {
+                    "description": "A list of alternate names that the organization is known as, or was known as in the past.",
+                    "items": {
+                        "$ref": "#/definitions/string"
+                    },
+                    "type": "array"
+                },
+                "contact": {
+                    "description": "The contact details of communication devices available relevant to the specific Organization. This can include addresses, phone numbers, fax numbers, mobile numbers, email addresses and web sites.",
+                    "items": {
+                        "$ref": "#/definitions/ExtendedContactDetail"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "resourceType"
+            ]
+        },
+        "Patient": {
+            "description": "Demographics and other administrative information about an individual or animal receiving care or other health-related services.",
+            "properties": {
+                "resourceType": {
+                    "description": "This is a Patient resource",
+                    "const": "Patient"
+                },
+                "id": {
+                    "description": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+                    "$ref": "#/definitions/id"
+                },
+                "identifier": {
+                    "description": "An identifier for this patient.",
+                    "items": {
+                        "$ref": "#/definitions/Identifier"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "description": "A name associated with the individual.",
+                    "items": {
+                        "$ref": "#/definitions/HumanName"
+                    },
+                    "type": "array"
+                },
+                "telecom": {
+                    "description": "A contact detail (e.g. a telephone number or an email address) by which the individual may be contacted.",
+                    "items": {
+                        "$ref": "#/definitions/ContactPoint"
+                    },
+                    "type": "array"
+                },
+                "gender": {
+                    "description": "Administrative Gender - the gender that the patient is considered to have for administration and record keeping purposes.",
+                    "$ref": "#/definitions/code"
+                },
+                "birthDate": {
+                    "description": "The date of birth for the individual.",
+                    "$ref": "#/definitions/date"
+                },
+                "address": {
+                    "description": "An address for the individual.",
+                    "items": {
+                        "$ref": "#/definitions/Address"
+                    },
+                    "type": "array"
+                },
+                "communication": {
+                    "description": "A language which may be used to communicate with the patient about his or her health.",
+                    "items": {
+                        "$ref": "#/definitions/Patient_Communication"
+                    },
+                    "type": "array"
+                },
+                "generalPractitioner": {
+                    "description": "Patient\u0027s nominated care provider.",
+                    "items": {
+                        "$ref": "#/definitions/Reference"
+                    },
+                    "type": "array"
+                },
+                "managingOrganization": {
+                    "description": "Organization that is the custodian of the patient record.",
+                    "$ref": "#/definitions/Reference"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "resourceType"
+            ]
+        },
+        "Patient_Communication": {
+            "description": "Demographics and other administrative information about an individual or animal receiving care or other health-related services.",
+            "properties": {
+                "language": {
+                    "description": "The ISO-639-1 alpha 2 code in lower case for the language, optionally followed by a hyphen and the ISO-3166-1 alpha 2 code for the region in upper case; e.g. \"en\" for English, or \"en-US\" for American English versus \"en-AU\" for Australian English.",
+                    "$ref": "#/definitions/CodeableConcept"
+                },
+                "preferred": {
+                    "description": "Indicates whether or not the patient prefers this language (over other languages he masters up a certain level).",
+                    "$ref": "#/definitions/boolean"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "language"
+            ]
+        },
+        "Practitioner": {
+            "description": "A person who is directly or indirectly involved in the provisioning of healthcare or related services.",
+            "properties": {
+                "resourceType": {
+                    "description": "This is a Practitioner resource",
+                    "const": "Practitioner"
+                },
+                "id": {
+                    "description": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+                    "$ref": "#/definitions/id"
+                },
+                "identifier": {
+                    "description": "An identifier that applies to this person in this role.",
+                    "items": {
+                        "$ref": "#/definitions/Identifier"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "description": "The name(s) associated with the practitioner.",
+                    "items": {
+                        "$ref": "#/definitions/HumanName"
+                    },
+                    "type": "array"
+                },
+                "telecom": {
+                    "description": "A contact detail for the practitioner, e.g. a telephone number or an email address.",
+                    "items": {
+                        "$ref": "#/definitions/ContactPoint"
+                    },
+                    "type": "array"
+                },
+                "address": {
+                    "description": "Address(es) of the practitioner that are not role specific (typically home address). \rWork addresses are not typically entered in this property as they are usually role dependent.",
+                    "items": {
+                        "$ref": "#/definitions/Address"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "resourceType"
+            ]
+        },
+        "Provenance": {
+            "description": "Provenance of a resource is a record that describes entities and processes involved in producing and delivering or otherwise influencing that resource. Provenance provides a critical foundation for assessing authenticity, enabling trust, and allowing reproducibility. Provenance assertions are a form of contextual metadata and can themselves become important records with their own provenance. Provenance statement indicates clinical significance in terms of confidence in authenticity, reliability, and trustworthiness, integrity, and stage in lifecycle (e.g. Document Completion - has the artifact been legally authenticated), all of which may impact security, privacy, and trust policies.",
+            "properties": {
+                "resourceType": {
+                    "description": "This is a Provenance resource",
+                    "const": "Provenance"
+                },
+                "id": {
+                    "description": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+                    "$ref": "#/definitions/id"
+                },
+                "target": {
+                    "description": "The Reference(s) that were generated or updated by  the activity described in this resource. A provenance can point to more than one target if multiple resources were created/updated by the same activity.",
+                    "items": {
+                        "$ref": "#/definitions/Reference"
+                    },
+                    "type": "array"
+                },
+                "recorded": {
+                    "description": "The instant of time at which the activity was recorded.",
+                    "$ref": "#/definitions/instant"
+                },
+                "agent": {
+                    "description": "An actor taking a role in an activity  for which it can be assigned some degree of responsibility for the activity taking place.",
+                    "items": {
+                        "$ref": "#/definitions/Provenance_Agent"
+                    },
+                    "type": "array"
+                },
+                "signature": {
+                    "description": "A digital signature on the target Reference(s). The signer should match a Provenance.agent. The purpose of the signature is indicated.",
+                    "items": {
+                        "$ref": "#/definitions/Signature"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "agent",
+                "resourceType",
+                "target"
+            ]
+        },
+        "Provenance_Agent": {
+            "description": "Provenance of a resource is a record that describes entities and processes involved in producing and delivering or otherwise influencing that resource. Provenance provides a critical foundation for assessing authenticity, enabling trust, and allowing reproducibility. Provenance assertions are a form of contextual metadata and can themselves become important records with their own provenance. Provenance statement indicates clinical significance in terms of confidence in authenticity, reliability, and trustworthiness, integrity, and stage in lifecycle (e.g. Document Completion - has the artifact been legally authenticated), all of which may impact security, privacy, and trust policies.",
+            "properties": {
+                "who": {
+                    "description": "Indicates who or what performed in the event.",
+                    "$ref": "#/definitions/Reference"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "who"
+            ]
+        },
+        "Quantity": {
+            "description": "A measured amount (or an amount that can potentially be measured). Note that measured amounts include amounts that are not precisely quantified, including amounts involving arbitrary units and floating currencies.",
+            "properties": {
+                "value": {
+                    "description": "The value of the measured amount. The value includes an implicit precision in the presentation of the value.",
+                    "$ref": "#/definitions/decimal"
+                },
+                "unit": {
+                    "description": "A human-readable form of the unit.",
+                    "$ref": "#/definitions/string"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "Reference": {
+            "description": "A reference from one resource to another.",
+            "properties": {
+                "reference": {
+                    "description": "A reference to a location at which the other resource is found. The reference may be a relative reference, in which case it is relative to the service base URL, or an absolute URL that resolves to the location where the resource is found. The reference may be version specific or not. If the reference is not to a FHIR RESTful server, then it should be assumed to be version specific. Internal fragment references (start with \u0027#\u0027) refer to contained resources.",
+                    "$ref": "#/definitions/string"
+                },
+                "type": {
+                    "description": "The expected type of the target of the reference. If both Reference.type and Reference.reference are populated and Reference.reference is a FHIR URL, both SHALL be consistent.\n\nThe type is the Canonical URL of Resource Definition that is the type this reference refers to. References are URLs that are relative to http://hl7.org/fhir/StructureDefinition/ e.g. \"Patient\" is a reference to http://hl7.org/fhir/StructureDefinition/Patient. Absolute URLs are only allowed for logical models (and can only be used in references in logical models, not resources).",
+                    "$ref": "#/definitions/uri"
+                },
+                "display": {
+                    "description": "Plain text narrative that identifies the resource in addition to the resource reference.",
+                    "$ref": "#/definitions/string"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        },
+        "RelatedPerson": {
+            "description": "Information about a person that is involved in a patient\u0027s health or the care for a patient, but who is not the target of healthcare, nor has a formal responsibility in the care process.",
+            "properties": {
+                "resourceType": {
+                    "description": "This is a RelatedPerson resource",
+                    "const": "RelatedPerson"
+                },
+                "id": {
+                    "description": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+                    "$ref": "#/definitions/id"
+                },
+                "patient": {
+                    "description": "The patient this person is related to.",
+                    "$ref": "#/definitions/Reference"
+                },
+                "relationship": {
+                    "description": "The nature of the relationship between the related person and the patient.",
+                    "items": {
+                        "$ref": "#/definitions/CodeableConcept"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "description": "A name associated with the person.",
+                    "items": {
+                        "$ref": "#/definitions/HumanName"
+                    },
+                    "type": "array"
+                },
+                "telecom": {
+                    "description": "A contact detail for the person, e.g. a telephone number or an email address.",
+                    "items": {
+                        "$ref": "#/definitions/ContactPoint"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "patient",
+                "resourceType"
+            ]
+        },
+        "RelatedPerson_Communication": {
+            "description": "Information about a person that is involved in a patient\u0027s health or the care for a patient, but who is not the target of healthcare, nor has a formal responsibility in the care process.",
+            "properties": {
+                "id": {
+                    "description": "Unique id for the element within a resource (for internal references). This may be any string value that does not contain spaces.",
+                    "$ref": "#/definitions/string"
+                },
+                "extension": {
+                    "description": "May be used to represent additional information that is not part of the basic definition of the element. To make the use of extensions safe and managable, there is a strict set of governance applied to the definition and use of extensions. Though any implementer can define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension.",
+                    "items": {
+                        "$ref": "#/definitions/Extension"
+                    },
+                    "type": "array"
+                },
+                "modifierExtension": {
+                    "description": "May be used to represent additional information that is not part of the basic definition of the element and that modifies the understanding of the element in which it is contained and/or the understanding of the containing element\u0027s descendants. Usually modifier elements provide negation or qualification. To make the use of extensions safe and managable, there is a strict set of governance applied to the definition and use of extensions. Though any implementer can define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension. Applications processing a resource are required to check for modifier extensions.\n\nModifier extensions SHALL NOT change the meaning of any elements on Resource or DomainResource (including cannot change the meaning of modifierExtension itself).",
+                    "items": {
+                        "$ref": "#/definitions/Extension"
+                    },
+                    "type": "array"
+                },
+                "language": {
+                    "description": "The ISO-639-1 alpha 2 code in lower case for the language, optionally followed by a hyphen and the ISO-3166-1 alpha 2 code for the region in upper case; e.g. \"en\" for English, or \"en-US\" for American English versus \"en-AU\" for Australian English.",
+                    "$ref": "#/definitions/CodeableConcept"
+                },
+                "preferred": {
+                    "description": "Indicates whether or not the related person prefers this language (over other languages he or she masters up a certain level).",
+                    "$ref": "#/definitions/boolean"
+                },
+                "_preferred": {
+                    "description": "Extensions for preferred",
+                    "$ref": "#/definitions/Element"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "language"
+            ]
+        },
+        "ResourceList": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/MessageHeader"
+                },
+                {
+                    "$ref": "#/definitions/List"
+                },
+                {
+                    "$ref": "#/definitions/Patient"
+                },
+                {
+                    "$ref": "#/definitions/Practitioner"
+                },
+                {
+                    "$ref": "#/definitions/Organization"
+                },
+                {
+                    "$ref": "#/definitions/Coverage"
+                },
+                {
+                    "$ref": "#/definitions/ServiceRequest"
+                },
+                {
+                    "$ref": "#/definitions/MedicationRequest"
+                },
+                {
+                    "$ref": "#/definitions/Condition"
+                },
+                {
+                    "$ref": "#/definitions/Provenance"
+                },
+                {
+                    "$ref": "#/definitions/RelatedPerson"
+                },
+                {
+                    "$ref": "#/definitions/Binary"
+                }
+            ]
+        },
+        "ServiceRequest": {
+            "description": "A record of a request for service such as diagnostic investigations, treatments, or operations to be performed.",
+            "properties": {
+                "resourceType": {
+                    "description": "This is a ServiceRequest resource",
+                    "const": "ServiceRequest"
+                },
+                "id": {
+                    "description": "The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes.",
+                    "$ref": "#/definitions/id"
+                },
+                "basedOn": {
+                    "description": "Plan/proposal/order fulfilled by this request.",
+                    "items": {
+                        "$ref": "#/definitions/Reference"
+                    },
+                    "type": "array"
+                },
+                "status": {
+                    "description": "The status of the order.",
+                    "$ref": "#/definitions/code"
+                },
+                "intent": {
+                    "description": "Whether the request is a proposal, plan, an original order or a reflex order.",
+                    "$ref": "#/definitions/code"
+                },
+                "code": {
+                    "description": "A code or reference that identifies a particular service (i.e., procedure, diagnostic investigation, or panel of investigations) that have been requested.",
+                    "$ref": "#/definitions/CodeableReference"
+                },
+                "subject": {
+                    "description": "On whom or what the service is to be performed. This is usually a human patient, but can also be requested on animals, groups of humans or animals, devices such as dialysis machines, or even locations (typically for environmental scans).",
+                    "$ref": "#/definitions/Reference"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "subject",
+                "resourceType"
+            ]
+        },
+        "Signature": {
+            "description": "A signature along with supporting context. The signature may be a digital signature that is cryptographic in nature, or some other signature acceptable to the domain. This other signature may be as simple as a graphical image representing a hand-written signature, or a signature ceremony Different signature approaches have different utilities.",
+            "properties": {
+                "sigFormat": {
+                    "description": "A mime type that indicates the technical format of the signature. Important mime types are application/signature+xml for X ML DigSig, application/jose for JWS, and image/* for a graphical image of a signature, etc.",
+                    "$ref": "#/definitions/code"
+                },
+                "data": {
+                    "description": "The base64 encoding of the Signature content. When signature is not recorded electronically this element would be empty.",
+                    "$ref": "#/definitions/base64Binary"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        }
+    }
+}
